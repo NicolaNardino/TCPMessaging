@@ -1,0 +1,6 @@
+RemoteSystemsTempFiles/
+.recommenders/
+.metadata/
+TCPServer/log/
+TCPServer/target/
+
