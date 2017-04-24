@@ -5,5 +5,5 @@ TCPServer/log/
 TCPServer/target/
 TestProject/
 Utility/target/
-BackendWebService/WebContent/WEB-INF/lib/*
-!BackendWebService/WebContent/WEB-INF/lib/gitkeep
+BackEndWebService/WebContent/WEB-INF/lib/*
+!BackEndWebService/WebContent/WEB-INF/lib/gitkeep
