@@ -1,4 +1,4 @@
-package com.projects.server;
+package com.projects.tcpserver;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;

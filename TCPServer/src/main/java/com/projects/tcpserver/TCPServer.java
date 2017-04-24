@@ -1,4 +1,4 @@
-package com.projects.server;
+package com.projects.tcpserver;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -9,8 +9,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.projects.server.utility.Utility;
 
 /**
  * Simple TCP Server, which spawns a thread for each client request. 
@@ -31,7 +29,7 @@ public final class TCPServer implements ITCPServer {
 	}
 	
 	/* (non-Javadoc)
-	 * @see com.projects.server.ITCPServer#start()
+	 * @see com.projects.server.ITCPgitServer#start()
 	 */
 	@Override
 	public void start() throws IOException {

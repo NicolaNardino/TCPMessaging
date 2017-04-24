@@ -1,4 +1,4 @@
-package com.projects.server.client;
+package com.projects.tcpserver.client;
 
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
@@ -6,8 +6,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
-import com.projects.server.utility.MessageType;
-import com.projects.server.utility.Utility;
+import com.projects.tcpserver.MessageType;
+import com.projects.tcpserver.Utility;
 
 public final class TestClient {
 

@@ -1,4 +1,4 @@
-package com.projects.server.client;
+package com.projects.tcpserver.client;
 
 import java.io.IOException;
 import java.net.UnknownHostException;

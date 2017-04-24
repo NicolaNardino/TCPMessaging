@@ -1,0 +1,113 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://webservice.projects.com/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http" name="BackendWSService" targetNamespace="http://webservice.projects.com/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://webservice.projects.com/" elementFormDefault="unqualified" targetNamespace="http://webservice.projects.com/" version="1.0">
+
+  <xs:element name="ChatMessage" nillable="true" type="xs:anyType"/>
+
+  <xs:element name="getMessages" type="tns:getMessages"/>
+
+  <xs:element name="getMessagesResponse" type="tns:getMessagesResponse"/>
+
+  <xs:element name="storeMessages" type="tns:storeMessages"/>
+
+  <xs:element name="storeMessagesResponse" type="tns:storeMessagesResponse"/>
+
+  <xs:complexType name="storeMessages">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="arg0" type="tns:MessageContainer"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="MessageContainer">
+    <xs:complexContent>
+      <xs:extension base="tns:ChatMessage">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="senderIdentifier" type="xs:string"/>
+          <xs:element minOccurs="0" name="sendDate" type="xs:dateTime"/>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ChatMessage">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="targetIdentifier" type="xs:string"/>
+      <xs:element minOccurs="0" name="message" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="storeMessagesResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="getMessages">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="getMessagesResponse">
+    <xs:sequence>
+      <xs:element maxOccurs="unbounded" minOccurs="0" name="return" type="tns:MessageContainer"/>
+    </xs:sequence>
+  </xs:complexType>
+
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="storeMessages">
+    <wsdl:part element="tns:storeMessages" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMessages">
+    <wsdl:part element="tns:getMessages" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getMessagesResponse">
+    <wsdl:part element="tns:getMessagesResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="storeMessagesResponse">
+    <wsdl:part element="tns:storeMessagesResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="BackendWS">
+    <wsdl:operation name="storeMessages">
+      <wsdl:input message="tns:storeMessages" name="storeMessages">
+    </wsdl:input>
+      <wsdl:output message="tns:storeMessagesResponse" name="storeMessagesResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMessages">
+      <wsdl:input message="tns:getMessages" name="getMessages">
+    </wsdl:input>
+      <wsdl:output message="tns:getMessagesResponse" name="getMessagesResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="BackendWSServiceSoapBinding" type="tns:BackendWS">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="storeMessages">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="storeMessages">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="storeMessagesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getMessages">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getMessages">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getMessagesResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="BackendWSService">
+    <wsdl:port binding="tns:BackendWSServiceSoapBinding" name="BackendWSPort">
+      <soap:address location="http://localhost:8080/BackendWebService/BackendWS"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

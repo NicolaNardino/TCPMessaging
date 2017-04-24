@@ -1,4 +1,4 @@
-package com.projects.server.utility;
+package com.projects.tcpserver;
 
 public enum MessageType {
 

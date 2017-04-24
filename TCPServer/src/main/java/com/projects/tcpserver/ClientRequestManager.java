@@ -1,17 +1,13 @@
-package com.projects.server;
+package com.projects.tcpserver;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.projects.server.utility.MessageType;
-import com.projects.server.utility.Utility;
 
 /**
  * It manages client requests, while keeping track of connected clients. 
@@ -79,31 +75,6 @@ public final class ClientRequestManager implements Runnable {
 		} 
 		catch (final Exception e) {
 			logger.warn("Error.", e);
-		}
-	}
-	
-	private static class ChatMessage {
-		
-		private final String targetIdentifier;
-		private final String message;
-		
-		public ChatMessage(String targetIdentifier, String message) {
-			super();
-			this.targetIdentifier = targetIdentifier;
-			this.message = message;
-		}
-		
-		public String getTargetIdentifier() {
-			return targetIdentifier;
-		}
-		public String getMessage() {
-			return message;
-		}
-		
-		public static ChatMessage build(final String rawMessage) {
-			final String temp[] = rawMessage.split(Pattern.quote("|"));
-			final String targetIdentifier = Utility.getSubString(temp[0], MessageType.TargetIdentifier);
-			return new ChatMessage(targetIdentifier, temp[1]);
 		}
 	}
 }

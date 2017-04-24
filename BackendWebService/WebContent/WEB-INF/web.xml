@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" version="3.1">
+  <display-name>BackendWebService</display-name>
+  <servlet>
+    <display-name>BackendWS</display-name>
+    <servlet-name>BackendWS</servlet-name>
+    <servlet-class>com.projects.webservice.BackendWS</servlet-class>
+  </servlet>
+  <listener>
+    <listener-class>com.projects.webservice.servlet.MyServletContextListener</listener-class>
+  </listener>
+  <context-param>
+    <param-name>mongodb_host</param-name>
+    <param-value>localhost</param-value>
+  </context-param>
+  <context-param>
+    <param-name>mongodb_port</param-name>
+    <param-value>27017</param-value>
+  </context-param>
+  <context-param>
+    <param-name>mongodb_database_name</param-name>
+    <param-value>ChatMessageDatabase</param-value>
+  </context-param>
+  <context-param>
+    <param-name>mongodb_collection_name</param-name>
+    <param-value>chatMessageCollection</param-value>
+  </context-param>
+  <servlet-mapping>
+    <servlet-name>BackendWS</servlet-name>
+    <url-pattern>/BackendWS</url-pattern>
+  </servlet-mapping>
+</web-app>

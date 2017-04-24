@@ -1,4 +1,4 @@
-package com.projects.server.utility;
+package com.projects.tcpserver;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -15,6 +15,7 @@ public final class Utility {
 
 	private static final Logger logger = LoggerFactory.getLogger(Utility.class);
 	private static final Random random = new Random();
+	public static final String MongoDBManagerServletContextAttributeName = "MongoDBManager";
 	
 	public static void shutdownExecutorService(final ExecutorService es, long timeout, TimeUnit timeUnit) throws InterruptedException {
 		es.shutdown();

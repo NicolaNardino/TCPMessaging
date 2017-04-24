@@ -1,10 +1,8 @@
-package com.projects.server;
+package com.projects.tcpserver;
 
 import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-
-import com.projects.server.utility.Utility;
 
 /**
  * Starts a TCP Server on a given port and listens to client requests. 

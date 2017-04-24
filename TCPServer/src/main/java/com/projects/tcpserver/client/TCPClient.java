@@ -1,4 +1,4 @@
-package com.projects.server.client;
+package com.projects.tcpserver.client;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -12,8 +12,8 @@ import java.util.stream.IntStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.projects.server.utility.MessageType;
-import com.projects.server.utility.Utility;
+import com.projects.tcpserver.MessageType;
+import com.projects.tcpserver.Utility;
 
 public final class TCPClient implements ITCPClient {
 	private static final Logger logger = LoggerFactory.getLogger(TCPClient.class);
