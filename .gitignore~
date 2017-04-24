@@ -1,9 +1,0 @@
-RemoteSystemsTempFiles/
-.recommenders/
-.metadata/
-TCPServer/log/
-TCPServer/target/
-TestProject/
-Utility/target/
-BackEndWebService/WebContent/WEB-INF/lib/*
-!BackEndWebService/WebContent/WEB-INF/lib/gitkeep
