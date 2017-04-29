@@ -20,8 +20,7 @@ public class ChatMessage {
 	
 	public ChatMessage() {}
 	
-	public ChatMessage(String targetIdentifier, String message) {
-		super();
+	public ChatMessage(final String targetIdentifier, final String message) {
 		this.targetIdentifier = targetIdentifier;
 		this.message = message;
 	}

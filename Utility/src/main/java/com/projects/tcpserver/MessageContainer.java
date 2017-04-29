@@ -29,7 +29,7 @@ public class MessageContainer extends ChatMessage {
 		return senderIdentifier;
 	}
 
-	public Date getStoreDate() {
+	public Date getSendDate() {
 		return sendDate;
 	}
 

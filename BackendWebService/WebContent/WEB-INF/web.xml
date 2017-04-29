@@ -4,10 +4,10 @@
   <servlet>
     <display-name>BackendWS</display-name>
     <servlet-name>BackendWS</servlet-name>
-    <servlet-class>com.projects.webservice.BackendWS</servlet-class>
+    <servlet-class>com.projects.webservice.mongodb.BackendWS</servlet-class>
   </servlet>
   <listener>
-    <listener-class>com.projects.webservice.servlet.MyServletContextListener</listener-class>
+    <listener-class>com.projects.webservice.mongodb.servlet.MyServletContextListener</listener-class>
   </listener>
   <context-param>
     <param-name>mongodb_host</param-name>

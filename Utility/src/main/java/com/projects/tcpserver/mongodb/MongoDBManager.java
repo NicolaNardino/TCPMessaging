@@ -75,7 +75,7 @@ public final class MongoDBManager implements AutoCloseable, DatabaseManager {
 		return new Document("SenderIdentifier", message.getSenderIdentifier())
 		        .append("TargetIdentifier", message.getTargetIdentifier())
 		        .append("Message",message.getMessage())
-				.append("StoreDate", message.getStoreDate());
+				.append("StoreDate", message.getSendDate());
 	}
 	
 	

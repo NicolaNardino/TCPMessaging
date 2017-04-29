@@ -17,7 +17,7 @@ public final class TestClient {
 		final ExecutorService es = Executors.newFixedThreadPool(clientsNumber);
 		IntStream.rangeClosed(1, clientsNumber).forEach((i) -> {
 			es.submit(() -> {
-				Thread.currentThread().setName("Thread "+i);
+				Thread.currentThread().setName("Client-Thread "+i);
 				try (final TCPClient client = new TCPClient("localhost", Integer.valueOf(properties.getProperty("port")), MessageType.IDPrefix.getMessageDescription()+"TestIdentifier"+i)) {
 					client.start();
 				}

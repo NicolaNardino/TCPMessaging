@@ -4,7 +4,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.Date;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,9 +20,12 @@ public final class ClientRequestManager implements Runnable {
 	private static final Logger logger = LoggerFactory.getLogger(ClientRequestManager.class);
 	private static final ConcurrentHashMap<String, Socket> Clients = new ConcurrentHashMap<>();
 	private final Socket clientSocket;
+	private final ArrayBlockingQueue<MessageContainer> messageQueue;
+	private static final AtomicInteger ai = new AtomicInteger(0);
 	
-	public ClientRequestManager(final Socket clientSocket) {
+	public ClientRequestManager(final Socket clientSocket, final ArrayBlockingQueue<MessageContainer> messageQueue) {
 		 this.clientSocket = clientSocket;
+		 this.messageQueue = messageQueue;
 	}
 	
 	/**
@@ -39,6 +45,7 @@ public final class ClientRequestManager implements Runnable {
 	 * */
 	@Override
 	public void run() {
+		Thread.currentThread().setName("ClientRequestManager-Thread-"+ai.getAndIncrement());
 		logger.info("Processing client request...");
 		try (final BufferedReader inputStreamBufferedReader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 				final PrintWriter outputStreamPrintWriter = new PrintWriter(clientSocket.getOutputStream(), true)) {
@@ -68,6 +75,7 @@ public final class ClientRequestManager implements Runnable {
 					final PrintWriter targetPrintWriter = new PrintWriter(targetSocket.getOutputStream(), true);
 					targetPrintWriter.println(MessageType.Sender.getMessageDescription()+clientIdentifier+"/ "+MessageType.ClientMessage.getMessageDescription()+chatMessage.getMessage());
 					logger.info("Sent message to "+chatMessage.getTargetIdentifier()+": "+chatMessage.getMessage());
+					messageQueue.put(new MessageContainer(clientIdentifier, chatMessage.getTargetIdentifier(), chatMessage.getMessage(), new Date()));//blocks if full.
 				}
 			}
 			outputStreamPrintWriter.println(MessageType.Disconnect.getMessageDescription());

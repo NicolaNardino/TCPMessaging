@@ -1,4 +1,4 @@
-package com.projects.webservice;
+package com.projects.webservice.mongodb;
 
 import java.util.List;
 
@@ -14,6 +14,9 @@ import com.projects.tcpserver.MessageContainer;
 import com.projects.tcpserver.Utility;
 import com.projects.tcpserver.mongodb.MongoDBManager;
 
+/**
+ * It takes the MongoDB connection from a servlet context, initialized from a context listener.
+ * */
 @WebService()
 public class BackendWS extends HttpServlet {
 

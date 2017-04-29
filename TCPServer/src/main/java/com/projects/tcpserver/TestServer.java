@@ -11,7 +11,7 @@ public final class TestServer {
 
 	public static void main(final String[] args) throws IOException {
 		final Properties properties = Utility.getApplicationProperties("tcpServer.properties");
-		final TCPServer server = new TCPServer(Integer.valueOf(properties.getProperty("port")));
+		final TCPServer server = new TCPServer(properties);
 		final Integer stopServerAfterSeconds = Integer.valueOf(properties.getProperty("stopServerAfterSeconds", "-1"));
 		if (stopServerAfterSeconds != -1)
 			server.stopAfter(stopServerAfterSeconds, TimeUnit.SECONDS);

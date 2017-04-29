@@ -1,4 +1,4 @@
-package com.projects.webservice.servlet;
+package com.projects.webservice.mongodb.servlet;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
