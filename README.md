@@ -21,4 +21,5 @@ The specific use case is about messaging in the context of a simulated chat sess
 ### Roadmap
 
 There's still much to come:
-1. A UI, which will show the messaging live.
+1. A REST web service to produce client messages.
+2. A UI, which will show the messaging live.
