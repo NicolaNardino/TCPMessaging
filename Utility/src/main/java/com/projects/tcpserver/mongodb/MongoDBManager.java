@@ -62,7 +62,7 @@ public final class MongoDBManager implements AutoCloseable, DatabaseManager {
 		} finally {
 		    cursor.close();
 		}
-		logger.info("Time taken to retrieve orders: "+(startTime - System.currentTimeMillis())+" ms.");
+		logger.info("Time taken to retrieve messages: "+(startTime - System.currentTimeMillis())+" ms.");
 		return result;
 	}
 	

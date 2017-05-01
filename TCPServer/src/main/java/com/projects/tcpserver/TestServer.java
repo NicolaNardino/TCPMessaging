@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit;
 public final class TestServer {
 
 	public static void main(final String[] args) throws IOException {
-		final Properties properties = Utility.getApplicationProperties("tcpServer.properties");
+		final Properties properties = Utility.getApplicationProperties("server.properties");
 		final TCPServer server = new TCPServer(properties);
 		final Integer stopServerAfterSeconds = Integer.valueOf(properties.getProperty("stopServerAfterSeconds", "-1"));
 		if (stopServerAfterSeconds != -1)

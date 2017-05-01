@@ -6,12 +6,14 @@ import java.net.ServerSocket;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.xml.datatype.DatatypeConfigurationException;
 
@@ -40,7 +42,7 @@ public final class TCPServer implements ITCPServer {
 	public TCPServer(final Properties properties) throws MalformedURLException {
 		es = Executors.newCachedThreadPool();
 		ses = Executors.newSingleThreadScheduledExecutor();
-		port = Integer.valueOf(properties.getProperty("port"));
+		port = Integer.valueOf(properties.getProperty("serverPort"));
 		backendWS = new BackendWSService(new URL(properties.getProperty("backendWSURL")));
 		final Integer messageQueueSize = Integer.valueOf(properties.getProperty("messageQueueSize"));
 		messageQueue = new ArrayBlockingQueue<MessageContainer>(messageQueueSize);
@@ -56,29 +58,9 @@ public final class TCPServer implements ITCPServer {
 		serverSocket = new ServerSocket(port);
 		logger.info("TCP Server started at port "+port);
 		es.submit(() -> storeMessages());
+		es.submit(() -> buildMessageStats());
 		while(!isStopped())
 			es.submit(new ClientRequestManager(serverSocket.accept(), messageQueue));
-	}
-	
-	private void storeMessages() {
-		Thread.currentThread().setName("MessageStore-Thread");
-		while(!isStopped()) {
-			//logger.debug("messageQueue.remainingCapacity() "+messageQueue.remainingCapacity());
-			if (messageQueue.remainingCapacity() <= messageQueueDrainThreshold) {
-				messageQueue.drainTo(tempMessageList);
-				try {
-					backendWS.getBackendWSPort().storeMessages(convertMessageContainerToJAXBType(tempMessageList));	
-				}
-				catch(Exception e) {
-					logger.warn("Error while storing messages", e);
-				}
-				logger.debug("Stored "+tempMessageList.size()+" to backend database.");
-				tempMessageList.clear();
-			}
-			try {
-				TimeUnit.MILLISECONDS.sleep(500);
-			} catch (InterruptedException e) {}
-		}
 	}
 	
 	/* (non-Javadoc)
@@ -115,6 +97,49 @@ public final class TCPServer implements ITCPServer {
 	
 	public boolean isStopped() {
 		return isStopped;
+	}
+	
+	/**
+	 * Evey 500 ms drains the message queue and stores its content to the MongoDB backend by a web service.
+	 * It runs in a separate thread until the server is up.
+	 * */
+	private void storeMessages() {
+		Thread.currentThread().setName("MessageStore-Thread");
+		while(!isStopped()) {
+			//logger.debug("messageQueue.remainingCapacity() "+messageQueue.remainingCapacity());
+			if (messageQueue.remainingCapacity() <= messageQueueDrainThreshold) {
+				messageQueue.drainTo(tempMessageList);
+				backendWS.getBackendWSPort().storeMessages(convertMessageContainerToJAXBType(tempMessageList));
+				logger.debug("Stored "+tempMessageList.size()+" to backend database.");
+				tempMessageList.clear();
+			}
+			try {
+				TimeUnit.MILLISECONDS.sleep(500);
+			} catch (InterruptedException e) {}
+		}
+	}
+	
+	/**
+	 * It runs every 5 seconds and pulls out all messages from the MongoDB message store and builds some stats of out of them.
+	 * It runs in a separate thread until the server is up.
+	 * */
+	private void buildMessageStats() {
+		Thread.currentThread().setName("MessageStats-Thread");
+		while(!isStopped()) {
+			final StringBuilder sb = new StringBuilder();
+			final List<com.projects.tcpserver.webservice.mongodb.client.MessageContainer> messages = backendWS.getBackendWSPort().getMessages(null);
+			sb.append("Total nr. messages: ").append(messages.size()).append("\n");
+			final Map<String, Long> messagesBySenderMap = 
+					messages.parallelStream().filter(m -> m.getSenderIdentifier() != null && m.getTargetIdentifier() != null).
+					collect(Collectors.groupingBy(com.projects.tcpserver.webservice.mongodb.client.MessageContainer::getSenderIdentifier, Collectors.counting()));
+			for(final Map.Entry<String, Long> messagesBySender: messagesBySenderMap.entrySet()) {
+				sb.append("Messages sent by: "+messagesBySender.getKey()+", nr.: "+messagesBySender.getValue()+"\n");
+			}
+			logger.debug(sb.toString());
+			try {
+				TimeUnit.SECONDS.sleep(5);
+			} catch (InterruptedException e) {}
+		}
 	}
 	
 	private static List<com.projects.tcpserver.webservice.mongodb.client.MessageContainer> convertMessageContainerToJAXBType(final List<MessageContainer> messages) {

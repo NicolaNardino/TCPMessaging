@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 
@@ -21,12 +22,14 @@ public final class TCPClient implements ITCPClient {
 	private final String host;
 	private final int port;
 	private final String identifier;
+	private final int upperBoundMessagesPerClient;
 	private Socket clientSocket;
 	
-	public TCPClient(final String host, final int port, final String identifier) {
-		this.host = host;
-		this.port = port;
-		this.identifier = identifier;
+	public TCPClient(final Properties properties, final String indentifier) {
+		host = properties.getProperty("serverHost");
+		port = Integer.valueOf(properties.getProperty("port"));
+		upperBoundMessagesPerClient = Integer.valueOf(properties.getProperty("upperBoundMessagesPerClient"));
+		this.identifier = indentifier;
 	}
 	
 	/**
@@ -53,11 +56,11 @@ public final class TCPClient implements ITCPClient {
 			}
 			//send messages, Target:<identifier>|<message>
 			final String actualIdentifier = Utility.getSubString(identifier, MessageType.IDPrefix);
-			IntStream.rangeClosed(1, Utility.getRandom(10)).forEach((i) -> {
+			IntStream.rangeClosed(1, Utility.getRandom(upperBoundMessagesPerClient)).forEach((i) -> {
 				if (!identifier.equals(actualIdentifier))  {
 					outputStream.println(MessageType.TargetIdentifier.getMessageDescription()+actualIdentifier+"|"+"Message"+i); ////avoid to send messages to sender.
 					try {
-						TimeUnit.MILLISECONDS.sleep(Utility.getRandom(1000));
+						TimeUnit.MILLISECONDS.sleep(Utility.getRandom(999));//sleep time between each send message.
 					} catch (final InterruptedException e) {}
 				}
 					
