@@ -29,6 +29,7 @@ public class ObjectFactory {
     private final static QName _GetMessagesResponse_QNAME = new QName("http://mongodb.webservice.projects.com/", "getMessagesResponse");
     private final static QName _StoreMessages_QNAME = new QName("http://mongodb.webservice.projects.com/", "storeMessages");
     private final static QName _StoreMessagesResponse_QNAME = new QName("http://mongodb.webservice.projects.com/", "storeMessagesResponse");
+    private final static QName _CredentialsCheckException_QNAME = new QName("http://mongodb.webservice.projects.com/", "CredentialsCheckException");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: com.projects.tcpserver.webservice.mongodb.client
@@ -67,6 +68,14 @@ public class ObjectFactory {
      */
     public StoreMessagesResponse createStoreMessagesResponse() {
         return new StoreMessagesResponse();
+    }
+
+    /**
+     * Create an instance of {@link CredentialsCheckException }
+     * 
+     */
+    public CredentialsCheckException createCredentialsCheckException() {
+        return new CredentialsCheckException();
     }
 
     /**
@@ -128,6 +137,15 @@ public class ObjectFactory {
     @XmlElementDecl(namespace = "http://mongodb.webservice.projects.com/", name = "storeMessagesResponse")
     public JAXBElement<StoreMessagesResponse> createStoreMessagesResponse(StoreMessagesResponse value) {
         return new JAXBElement<StoreMessagesResponse>(_StoreMessagesResponse_QNAME, StoreMessagesResponse.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link CredentialsCheckException }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://mongodb.webservice.projects.com/", name = "CredentialsCheckException")
+    public JAXBElement<CredentialsCheckException> createCredentialsCheckException(CredentialsCheckException value) {
+        return new JAXBElement<CredentialsCheckException>(_CredentialsCheckException_QNAME, CredentialsCheckException.class, null, value);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.projects.webservice.mongodb;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.jws.WebMethod;
@@ -13,6 +14,7 @@ import javax.xml.ws.handler.MessageContext;
 import com.projects.tcpserver.MessageContainer;
 import com.projects.tcpserver.Utility;
 import com.projects.tcpserver.mongodb.MongoDBManager;
+import com.projects.tcpserver.webservice.CredentialsCheckException;
 
 /**
  * It takes the MongoDB connection from a servlet context, initialized from a context listener.
@@ -26,12 +28,32 @@ public class BackendWS extends HttpServlet {
     WebServiceContext wsctx;
 	
 	@WebMethod()
-	public void storeMessages(final List<MessageContainer> messages) {
-		((MongoDBManager)((ServletContext) wsctx.getMessageContext().get(MessageContext.SERVLET_CONTEXT)).getAttribute(Utility.MongoDBManagerServletContextAttributeName)).storeMessages(messages, false);
+	public void storeMessages(final List<MessageContainer> messages) throws CredentialsCheckException {
+		final MessageContext messageContext = wsctx.getMessageContext();
+		final ServletContext servletContext = (ServletContext) messageContext.get(MessageContext.SERVLET_CONTEXT);
+		checkCredentials(messageContext, servletContext);
+		((MongoDBManager)servletContext.getAttribute(Utility.MongoDBManagerServletContextAttributeName)).storeMessages(messages, false);
 	}
 	
 	@WebMethod()
-	public List<MessageContainer> getMessages(final String senderIdentifier) {
-		return ((MongoDBManager)((ServletContext) wsctx.getMessageContext().get(MessageContext.SERVLET_CONTEXT)).getAttribute(Utility.MongoDBManagerServletContextAttributeName)).getMessages(senderIdentifier);
+	public List<MessageContainer> getMessages(final String senderIdentifier) throws CredentialsCheckException {
+		final MessageContext messageContext = wsctx.getMessageContext();
+		final ServletContext servletContext = (ServletContext) messageContext.get(MessageContext.SERVLET_CONTEXT);
+		checkCredentials(messageContext, servletContext);
+		return ((MongoDBManager)servletContext.getAttribute(Utility.MongoDBManagerServletContextAttributeName)).getMessages(senderIdentifier);
+	}
+	
+	private static void checkCredentials(final MessageContext messageContext, final ServletContext servletContext) throws CredentialsCheckException {
+		@SuppressWarnings("unchecked")
+		final Map<String, List<String>> requestHeaders = (Map<String, List<String>>)messageContext.get(MessageContext.HTTP_REQUEST_HEADERS);
+		if (requestHeaders != null) {
+			final String username = requestHeaders.get(Utility.BackendWSUsernameHeader).get(0);
+			final String password = requestHeaders.get(Utility.BackendWSPasswordHeader).get(0);
+			final String servletContextBackendWSUsername = servletContext.getAttribute(Utility.BackendWSUsernameHeader).toString();
+			final String servletContextBackendWSPassword = servletContext.getAttribute(Utility.BackendWSPasswordHeader).toString();
+			System.out.println(servletContextBackendWSUsername+"/ "+servletContextBackendWSPassword);
+			if (!(username.equals(servletContextBackendWSUsername) && password.equals(servletContextBackendWSPassword)))
+				throw new CredentialsCheckException("Failed credentials check.");
+		}
 	}
 }

@@ -27,7 +27,7 @@ public final class TCPClient implements ITCPClient {
 	
 	public TCPClient(final Properties properties, final String indentifier) {
 		host = properties.getProperty("serverHost");
-		port = Integer.valueOf(properties.getProperty("port"));
+		port = Integer.valueOf(properties.getProperty("serverPort"));
 		upperBoundMessagesPerClient = Integer.valueOf(properties.getProperty("upperBoundMessagesPerClient"));
 		this.identifier = indentifier;
 	}

@@ -12,12 +12,12 @@ import com.projects.tcpserver.mongodb.MongoDBManager;
  * This context listener gets used to initialize (and destroy) the MongoDB database client connection.
  * */
 public final class MyServletContextListener implements ServletContextListener{
-
+	
 	@Override
 	public void contextDestroyed(final ServletContextEvent event) {
 		try {
 			((MongoDBManager)event.getServletContext().getAttribute(Utility.MongoDBManagerServletContextAttributeName)).close();
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			e.printStackTrace();
 		}
 	}
@@ -29,5 +29,7 @@ public final class MyServletContextListener implements ServletContextListener{
 				Integer.valueOf(sc.getInitParameter("mongodb_port")), sc.getInitParameter("mongodb_database_name")), 
 				sc.getInitParameter("mongodb_collection_name"));
 		sc.setAttribute(Utility.MongoDBManagerServletContextAttributeName, mdbm);
+		sc.setAttribute(Utility.BackendWSUsernameHeader, sc.getInitParameter(Utility.BackendWSUsernameHeader));
+		sc.setAttribute(Utility.BackendWSPasswordHeader, sc.getInitParameter(Utility.BackendWSPasswordHeader));
 	}
 }

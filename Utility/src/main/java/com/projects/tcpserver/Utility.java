@@ -20,9 +20,11 @@ import org.slf4j.LoggerFactory;
 public final class Utility {
 
 	private static final Logger logger = LoggerFactory.getLogger(Utility.class);
-	private static final Random random = new Random();
+	private static final Random Random = new Random();
 	public static final String MongoDBManagerServletContextAttributeName = "MongoDBManager";
-	private static final GregorianCalendar gcalendar = new GregorianCalendar();
+	public static final String BackendWSUsernameHeader = "backend_ws_username";
+	public static final String BackendWSPasswordHeader = "backend_ws_password";
+	private static final GregorianCalendar GregorianCalendar = new GregorianCalendar();
 	
 	public static void shutdownExecutorService(final ExecutorService es, long timeout, TimeUnit timeUnit) throws InterruptedException {
 		es.shutdown();
@@ -40,7 +42,7 @@ public final class Utility {
 	}
 	
 	public static int getRandom(final int upperBound) {
-		return random.nextInt(upperBound);
+		return Random.nextInt(upperBound);
 	}
 	
 	public static String getSubString(final String sourceString, final MessageType messageType) {
@@ -48,7 +50,7 @@ public final class Utility {
 	}
 	
 	public static XMLGregorianCalendar getXMLGregorianCalendar(final Date date) throws DatatypeConfigurationException {
-		gcalendar.setTime(date);
-		return DatatypeFactory.newInstance().newXMLGregorianCalendar(gcalendar);
+		GregorianCalendar.setTime(date);
+		return DatatypeFactory.newInstance().newXMLGregorianCalendar(GregorianCalendar);
 	}
 }
