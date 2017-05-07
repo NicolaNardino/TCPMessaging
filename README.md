@@ -14,7 +14,8 @@ The specific use case is about messaging in the context of a simulated chat sess
 - Multithreaded TCP server.
 - Multithreaded TCP clients runner.
 - A well-defined client/ server protocol.
-- JAXB web service to interact with MongoDB, implemented by a servlet.
+- JAX-WS web service to interact with MongoDB, implemented by a servlet.
+- Web service authentication layer by passing caller credentials in the web service request context http headers.
 - Servlet context listener used to initialize a MongoDB cient and store it to the servlet context.
 - Various side-services like the ones that store and load messages from/ to MongoDB.
 
