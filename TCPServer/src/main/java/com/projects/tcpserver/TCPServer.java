@@ -48,7 +48,7 @@ public final class TCPServer implements ITCPServer {
 	
 
 	public TCPServer(final Properties properties) throws MalformedURLException {
-		es = Executors.newCachedThreadPool();
+		es = Executors.newFixedThreadPool(Integer.valueOf(properties.getProperty("maxRequestHandlerThreads")));
 		ses = Executors.newSingleThreadScheduledExecutor();
 		port = Integer.valueOf(properties.getProperty("serverPort"));
 		backendWSPort = new BackendWSService(new URL(properties.getProperty("backendWSURL"))).getBackendWSPort();
