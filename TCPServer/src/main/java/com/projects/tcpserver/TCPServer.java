@@ -24,6 +24,7 @@ import javax.xml.ws.handler.MessageContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.projects.tcpserver.webservice.handler.SoapHandlerResolver;
 import com.projects.tcpserver.webservice.mongodb.client.BackendWS;
 import com.projects.tcpserver.webservice.mongodb.client.BackendWSService;
 import com.projects.tcpserver.webservice.mongodb.client.CredentialsCheckException_Exception;
@@ -51,7 +52,9 @@ public final class TCPServer implements ITCPServer {
 		es = Executors.newFixedThreadPool(Integer.valueOf(properties.getProperty("maxRequestHandlerThreads")));
 		ses = Executors.newSingleThreadScheduledExecutor();
 		port = Integer.valueOf(properties.getProperty("serverPort"));
-		backendWSPort = new BackendWSService(new URL(properties.getProperty("backendWSURL"))).getBackendWSPort();
+		final BackendWSService backendWSService = new BackendWSService(new URL(properties.getProperty("backendWSURL")));
+		backendWSService.setHandlerResolver(new SoapHandlerResolver(Boolean.valueOf(properties.getProperty("storeOutboundMessages"))));
+		backendWSPort = backendWSService.getBackendWSPort();
 		setWebServiceCredentials(backendWSPort, properties.getProperty("backendWSUsername"), properties.getProperty("backendWSPassword"));
 		final Integer messageQueueSize = Integer.valueOf(properties.getProperty("messageQueueSize"));
 		messageQueue = new ArrayBlockingQueue<MessageContainer>(messageQueueSize);
