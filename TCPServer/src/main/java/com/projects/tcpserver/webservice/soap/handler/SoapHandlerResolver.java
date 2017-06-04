@@ -1,4 +1,4 @@
-package com.projects.tcpserver.webservice.handler;
+package com.projects.tcpserver.webservice.soap.handler;
 
 import java.util.Arrays;
 import java.util.List;

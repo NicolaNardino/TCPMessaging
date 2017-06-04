@@ -24,10 +24,10 @@ import javax.xml.ws.handler.MessageContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.projects.tcpserver.webservice.handler.SoapHandlerResolver;
 import com.projects.tcpserver.webservice.mongodb.client.BackendWS;
 import com.projects.tcpserver.webservice.mongodb.client.BackendWSService;
 import com.projects.tcpserver.webservice.mongodb.client.CredentialsCheckException_Exception;
+import com.projects.tcpserver.webservice.soap.handler.SoapHandlerResolver;
 
 /**
  * Simple TCP Server, which spawns a thread for each client request. 
@@ -126,9 +126,13 @@ public final class TCPServer implements ITCPServer {
 				messageQueue.drainTo(tempMessageList);
 				try {
 					backendWSPort.storeMessages(convertMessageContainerToJAXBType(tempMessageList));
-				} catch (final CredentialsCheckException_Exception e) {
+				} 
+				catch (final CredentialsCheckException_Exception e) {
 					logger.warn("Unable to store client messages due to failed credentials check.");
 					break;
+				}
+				catch (final Exception e) {
+					logger.warn("Error while storing messages.", e);
 				}
 				logger.debug("Stored "+tempMessageList.size()+" to backend database.");
 				tempMessageList.clear();
@@ -151,18 +155,21 @@ public final class TCPServer implements ITCPServer {
 			List<com.projects.tcpserver.webservice.mongodb.client.MessageContainer> messages;
 			try {
 				messages = backendWSPort.getMessages(null);
-			} catch (final CredentialsCheckException_Exception e) {
+				sb.append("Total nr. messages: ").append(messages.size()).append("\n");
+				final Map<String, Long> messagesBySenderMap = 
+						messages.parallelStream().filter(m -> m.getSenderIdentifier() != null && m.getTargetIdentifier() != null).
+						collect(Collectors.groupingBy(com.projects.tcpserver.webservice.mongodb.client.MessageContainer::getSenderIdentifier, Collectors.counting()));
+				for(final Map.Entry<String, Long> messagesBySender: messagesBySenderMap.entrySet()) 
+					sb.append("Messages sent by: "+messagesBySender.getKey()+", nr.: "+messagesBySender.getValue()+"\n");
+				logger.debug(sb.toString());
+			} 
+			catch (final CredentialsCheckException_Exception e) {
 				logger.warn("Unable to read messages due to failed credentials check.");
 				break;
 			}
-			sb.append("Total nr. messages: ").append(messages.size()).append("\n");
-			final Map<String, Long> messagesBySenderMap = 
-					messages.parallelStream().filter(m -> m.getSenderIdentifier() != null && m.getTargetIdentifier() != null).
-					collect(Collectors.groupingBy(com.projects.tcpserver.webservice.mongodb.client.MessageContainer::getSenderIdentifier, Collectors.counting()));
-			for(final Map.Entry<String, Long> messagesBySender: messagesBySenderMap.entrySet()) {
-				sb.append("Messages sent by: "+messagesBySender.getKey()+", nr.: "+messagesBySender.getValue()+"\n");
+			catch (final Exception e) {
+				logger.warn("Error while getting messages.", e);
 			}
-			logger.debug(sb.toString());
 			try {
 				TimeUnit.SECONDS.sleep(buildMessagesStatsEveryXSeconds);
 			} catch (InterruptedException e) {}

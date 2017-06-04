@@ -1,6 +1,5 @@
-package com.projects.tcpserver.webservice.handler;
+package com.projects.tcpserver.webservice.soap.handler;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -8,6 +7,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -20,12 +20,19 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.projects.tcpserver.Utility;
+
 /**
  * Adds a sequence number to each out-bound message and, if enabled by configuration, allows to store message in the local filesystem. 
  * The only instance of this class runs in the MessageStore-Thread.
  * */
 public final class ClientSoapHandler implements SOAPHandler<SOAPMessageContext> {
 
+	private static final Logger logger = LoggerFactory.getLogger(ClientSoapHandler.class);
+	
 	public static int counter = 1;
 	private static String messageStoreFilePath = "log/OutboundSoapMessages.log";
 	private static final short messageBufferSize = 10;
@@ -42,15 +49,17 @@ public final class ClientSoapHandler implements SOAPHandler<SOAPMessageContext> 
 		if ((Boolean) context.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY)) {
 			try {
 				final SOAPMessage soapMessage = context.getMessage();
+				@SuppressWarnings({ "unused", "unchecked" })
+				Map<String, List<String>> headers = (Map<String, List<String>>) context.get(MessageContext.HTTP_REQUEST_HEADERS);
 				final SOAPEnvelope soapEnvelope = soapMessage.getSOAPPart().getEnvelope();
 				SOAPHeader soapHeader = soapEnvelope.getHeader();
 				if (soapHeader == null) 
 					soapHeader = soapEnvelope.addHeader();
-				final SOAPHeaderElement soapHeaderElement = soapHeader.addHeaderElement(new QName("http://http://github.com/nicolanardino/tcpmessaging", "sequence"));
+				final SOAPHeaderElement soapHeaderElement = soapHeader.addHeaderElement(new QName(Utility.SoapHeaderNamespaceURI, Utility.SoapHeaderSequenceName));
 				final int sequenceNumber = counter++;
 				soapHeaderElement.addTextNode(String.valueOf(sequenceNumber));
 				soapMessage.saveChanges();
-				messageBuffer.add(new Date()+"/ "+sequenceNumber+"/ "+buildStringFromSoapMessage(soapMessage)+"/n");
+				messageBuffer.add(new Date()+"/ "+sequenceNumber+"/ "+ Utility.buildStringFromSoapMessage(soapMessage)+"/n");
 				if (storeOutboundMessages && sequenceNumber%messageBufferSize == 0) {
 					messageBuffer.add("\n\n");
 					Files.write(Paths.get(messageStoreFilePath), messageBuffer, StandardOpenOption.CREATE,StandardOpenOption.APPEND);
@@ -58,20 +67,10 @@ public final class ClientSoapHandler implements SOAPHandler<SOAPMessageContext> 
 				}
 					
 			} catch (final SOAPException | IOException e) {
-				System.err.println(e);
+				logger.warn("Error while processing handleMessage.", e);
 			} 
 		}
 		return true;
-	}
-	
-	private static String buildStringFromSoapMessage(final SOAPMessage soapMessage) {
-		try(final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-			soapMessage.writeTo(baos);
-			return baos.toString();
-		} catch (final IOException | SOAPException e) {
-			e.printStackTrace();
-			return "";
-		}
 	}
 
 	@Override

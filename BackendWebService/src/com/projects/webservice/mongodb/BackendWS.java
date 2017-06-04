@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.jws.HandlerChain;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import javax.servlet.ServletContext;
@@ -20,6 +21,7 @@ import com.projects.tcpserver.webservice.CredentialsCheckException;
  * It takes the MongoDB connection from a servlet context, initialized from a context listener.
  * */
 @WebService()
+@HandlerChain(file="soap/handler/handler-chain.xml")
 public class BackendWS extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -51,7 +53,6 @@ public class BackendWS extends HttpServlet {
 			final String password = requestHeaders.get(Utility.BackendWSPasswordHeader).get(0);
 			final String servletContextBackendWSUsername = servletContext.getAttribute(Utility.BackendWSUsernameHeader).toString();
 			final String servletContextBackendWSPassword = servletContext.getAttribute(Utility.BackendWSPasswordHeader).toString();
-			System.out.println(servletContextBackendWSUsername+"/ "+servletContextBackendWSPassword);
 			if (!(username.equals(servletContextBackendWSUsername) && password.equals(servletContextBackendWSPassword)))
 				throw new CredentialsCheckException("Failed credentials check.");
 		}

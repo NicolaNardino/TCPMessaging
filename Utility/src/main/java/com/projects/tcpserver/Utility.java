@@ -1,5 +1,6 @@
 package com.projects.tcpserver;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +14,8 @@ import java.util.concurrent.TimeUnit;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +27,8 @@ public final class Utility {
 	public static final String MongoDBManagerServletContextAttributeName = "MongoDBManager";
 	public static final String BackendWSUsernameHeader = "backend_ws_username";
 	public static final String BackendWSPasswordHeader = "backend_ws_password";
+	public static final String SoapHeaderSequenceName = "sequence";
+	public static final String SoapHeaderNamespaceURI = "http://github.com/nicolanardino/tcpmessaging";
 	private static final GregorianCalendar GregorianCalendar = new GregorianCalendar();
 	
 	public static void shutdownExecutorService(final ExecutorService es, long timeout, TimeUnit timeUnit) throws InterruptedException {
@@ -52,5 +57,15 @@ public final class Utility {
 	public static XMLGregorianCalendar getXMLGregorianCalendar(final Date date) throws DatatypeConfigurationException {
 		GregorianCalendar.setTime(date);
 		return DatatypeFactory.newInstance().newXMLGregorianCalendar(GregorianCalendar);
+	}
+	
+	public static String buildStringFromSoapMessage(final SOAPMessage soapMessage) {
+		try(final ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+			soapMessage.writeTo(baos);
+			return baos.toString();
+		} catch (final IOException | SOAPException e) {
+			logger.warn("Error while converting SOAP message to string.");
+			return "";
+		}
 	}
 }

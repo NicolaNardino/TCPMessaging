@@ -13,7 +13,11 @@ import javax.xml.ws.WebFault;
 @WebFault(name = "CredentialsCheckException", targetNamespace = "http://mongodb.webservice.projects.com/")
 public class CredentialsCheckException_Exception extends Exception {
     
-    private com.projects.tcpserver.webservice.mongodb.client.CredentialsCheckException credentialsCheckException;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	private com.projects.tcpserver.webservice.mongodb.client.CredentialsCheckException credentialsCheckException;
 
     public CredentialsCheckException_Exception() {
         super();
