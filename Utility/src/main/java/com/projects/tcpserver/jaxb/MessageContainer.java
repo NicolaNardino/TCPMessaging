@@ -1,4 +1,4 @@
-package com.projects.tcpserver;
+package com.projects.tcpserver.jaxb;
 
 import java.util.Date;
 

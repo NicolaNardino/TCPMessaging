@@ -1,4 +1,4 @@
-package com.projects.tcpserver;
+package com.projects.tcpserver.jaxb;
 
 import java.util.regex.Pattern;
 
@@ -7,6 +7,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+
+import com.projects.tcpserver.MessageType;
+import com.projects.tcpserver.Utility;
 
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "ChatMessage")

@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
-import com.projects.tcpserver.MessageContainer;
+import com.projects.tcpserver.jaxb.MessageContainer;
 
 public final class MongoDBManager implements AutoCloseable, DatabaseManager {
 	private static Logger logger = LoggerFactory.getLogger(MongoDBManager.class);

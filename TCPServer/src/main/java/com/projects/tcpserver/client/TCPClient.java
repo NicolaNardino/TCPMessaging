@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 
 import com.projects.tcpserver.MessageType;
 import com.projects.tcpserver.Utility;
+import com.projects.tcpserver.restful.MessageRepositoryClientInterface;
+import com.projects.tcpserver.restful.MessageRepositoryRestfulClient;
 
 public final class TCPClient implements ITCPClient {
 	private static final Logger logger = LoggerFactory.getLogger(TCPClient.class);
@@ -23,12 +25,14 @@ public final class TCPClient implements ITCPClient {
 	private final int port;
 	private final String identifier;
 	private final int upperBoundMessagesPerClient;
+	private final MessageRepositoryClientInterface mrci;
 	private Socket clientSocket;
 	
 	public TCPClient(final Properties properties, final String indentifier) {
 		host = properties.getProperty("serverHost");
 		port = Integer.valueOf(properties.getProperty("serverPort"));
 		upperBoundMessagesPerClient = Integer.valueOf(properties.getProperty("upperBoundMessagesPerClient"));
+		mrci = new MessageRepositoryRestfulClient(properties.getProperty("restfulBaseURL"));
 		this.identifier = indentifier;
 	}
 	
@@ -58,7 +62,7 @@ public final class TCPClient implements ITCPClient {
 			final String actualIdentifier = Utility.getSubString(identifier, MessageType.IDPrefix);
 			IntStream.rangeClosed(1, Utility.getRandom(upperBoundMessagesPerClient)).forEach((i) -> {
 				if (!identifier.equals(actualIdentifier))  {
-					outputStream.println(MessageType.TargetIdentifier.getMessageDescription()+actualIdentifier+"|"+"Message"+i); ////avoid to send messages to sender.
+					outputStream.println(MessageType.TargetIdentifier.getMessageDescription()+actualIdentifier+"|"+mrci.getMessage(actualIdentifier)); //avoid to send messages to sender.
 					try {
 						TimeUnit.MILLISECONDS.sleep(Utility.getRandom(999));//sleep time between each send message.
 					} catch (final InterruptedException e) {}

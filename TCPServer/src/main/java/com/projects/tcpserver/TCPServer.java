@@ -24,6 +24,7 @@ import javax.xml.ws.handler.MessageContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.projects.tcpserver.jaxb.MessageContainer;
 import com.projects.tcpserver.webservice.mongodb.client.BackendWS;
 import com.projects.tcpserver.webservice.mongodb.client.BackendWSService;
 import com.projects.tcpserver.webservice.mongodb.client.CredentialsCheckException_Exception;

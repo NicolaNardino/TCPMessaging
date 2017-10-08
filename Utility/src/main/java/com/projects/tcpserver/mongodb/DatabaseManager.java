@@ -2,7 +2,7 @@ package com.projects.tcpserver.mongodb;
 
 import java.util.List;
 
-import com.projects.tcpserver.MessageContainer;
+import com.projects.tcpserver.jaxb.MessageContainer;
 
 public interface DatabaseManager {
 

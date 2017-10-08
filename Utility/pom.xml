@@ -3,6 +3,9 @@
   <groupId>com.projects.tcpserver</groupId>
   <artifactId>Utility</artifactId>
   <version>0.0.1-SNAPSHOT</version>
+  <properties>
+    <resteasy.version>3.0.19.Final</resteasy.version>
+  </properties>
   <dependencies>
 <dependency>
     <groupId>org.slf4j</groupId>
@@ -24,5 +27,20 @@
         <artifactId>mongodb-driver</artifactId>
         <version>3.4.2</version>
     </dependency>
+    <dependency>
+		<groupId>org.jboss.resteasy</groupId>
+		<artifactId>resteasy-jaxrs</artifactId>
+		<version>${resteasy.version}</version>
+  	</dependency>
+  	<dependency>
+		<groupId>org.jboss.resteasy</groupId>
+		<artifactId>resteasy-client</artifactId>
+		<version>${resteasy.version}</version>
+  	</dependency>
+  	<dependency>
+		<groupId>org.jboss.resteasy</groupId>
+		<artifactId>resteasy-jaxb-provider</artifactId>
+		<version>${resteasy.version}</version>
+  	</dependency>
   </dependencies>
 </project>

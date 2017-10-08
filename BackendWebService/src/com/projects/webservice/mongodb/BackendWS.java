@@ -12,8 +12,8 @@ import javax.servlet.http.HttpServlet;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
-import com.projects.tcpserver.MessageContainer;
 import com.projects.tcpserver.Utility;
+import com.projects.tcpserver.jaxb.MessageContainer;
 import com.projects.tcpserver.mongodb.MongoDBManager;
 import com.projects.tcpserver.webservice.CredentialsCheckException;
 

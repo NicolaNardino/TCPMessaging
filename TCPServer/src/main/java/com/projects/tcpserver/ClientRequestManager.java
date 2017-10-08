@@ -12,6 +12,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.projects.tcpserver.jaxb.ChatMessage;
+import com.projects.tcpserver.jaxb.MessageContainer;
+
 /**
  * It manages client requests, while keeping track of connected clients. 
  * 

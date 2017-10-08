@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+     http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+ 
+   <display-name>RestEasy Example</display-name>
+ 
+   <context-param>
+      <param-name>resteasy.servlet.mapping.prefix</param-name>
+      <param-value>/rest</param-value>
+   </context-param>
+   <context-param>
+    <param-name>mongodb_host</param-name>
+    <param-value>localhost</param-value>
+  </context-param>
+  <context-param>
+    <param-name>mongodb_port</param-name>
+    <param-value>27017</param-value>
+  </context-param>
+  <context-param>
+    <param-name>mongodb_database_name</param-name>
+    <param-value>ChatMessageDatabase</param-value>
+  </context-param>
+  <context-param>
+    <param-name>mongodb_collection_name</param-name>
+    <param-value>chatMessageCollection</param-value>
+  </context-param>
+   <listener>
+    <listener-class>com.projects.tcpserver.restfulbackend.servlet.RestfulServletContextListener</listener-class>
+  </listener>
+  
+   <servlet>
+    <servlet-name>WADL</servlet-name>
+    <servlet-class>org.jboss.resteasy.wadl.ResteasyWadlServlet</servlet-class>
+  </servlet>
+
+	<servlet-mapping>
+       <servlet-name>WADL</servlet-name>
+       <url-pattern>/application.wadl</url-pattern>
+    </servlet-mapping>
+ 
+</web-app>
