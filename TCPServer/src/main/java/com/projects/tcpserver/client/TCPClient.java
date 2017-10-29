@@ -32,7 +32,7 @@ public final class TCPClient implements ITCPClient {
 		host = properties.getProperty("serverHost");
 		port = Integer.valueOf(properties.getProperty("serverPort"));
 		upperBoundMessagesPerClient = Integer.valueOf(properties.getProperty("upperBoundMessagesPerClient"));
-		mrci = new MessageRepositoryRestfulClient(properties.getProperty("restfulBaseURL"));
+		mrci = new MessageRepositoryRestfulClient(properties.getProperty("restfulBaseURL"), properties.getProperty("restfulBackendWSUsername"), properties.getProperty("restfulBackendWSPassword"));
 		this.identifier = indentifier;
 	}
 	

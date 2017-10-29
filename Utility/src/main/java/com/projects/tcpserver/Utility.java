@@ -11,6 +11,7 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.ServletContext;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -19,6 +20,9 @@ import javax.xml.soap.SOAPMessage;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.projects.tcpserver.mongodb.MongoDBConnection;
+import com.projects.tcpserver.mongodb.MongoDBManager;
 
 public final class Utility {
 
@@ -66,6 +70,22 @@ public final class Utility {
 		} catch (final IOException | SOAPException e) {
 			logger.warn("Error while converting SOAP message to string.");
 			return "";
+		}
+	}
+	
+	public static void setServletContextAttributes(final ServletContext sc) {
+		sc.setAttribute(Utility.MongoDBManagerServletContextAttributeName, new MongoDBManager(new MongoDBConnection(sc.getInitParameter("mongodb_host"), 
+				Integer.valueOf(sc.getInitParameter("mongodb_port")), sc.getInitParameter("mongodb_database_name")), 
+				sc.getInitParameter("mongodb_collection_name")));
+		sc.setAttribute(Utility.BackendWSUsernameHeader, sc.getInitParameter(Utility.BackendWSUsernameHeader));
+		sc.setAttribute(Utility.BackendWSPasswordHeader, sc.getInitParameter(Utility.BackendWSPasswordHeader));
+	}
+	
+	public static void setContextDestroyed(final ServletContext sc) {
+		try {
+			((MongoDBManager)sc.getAttribute(Utility.MongoDBManagerServletContextAttributeName)).close();
+		} catch (final Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

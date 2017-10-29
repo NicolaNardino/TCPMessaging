@@ -1,4 +1,4 @@
-package com.projects.tcpserver.restfulbackend.servlet;
+package com.projects.webservice.mongodb.servlet;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -8,7 +8,7 @@ import com.projects.tcpserver.Utility;
 /**
  * This context listener gets used to initialize (and destroy) the MongoDB database client connection.
  * */
-public final class RestfulServletContextListener implements ServletContextListener{
+public final class SoapServletContextListener implements ServletContextListener {
 	
 	@Override
 	public void contextDestroyed(final ServletContextEvent event) {

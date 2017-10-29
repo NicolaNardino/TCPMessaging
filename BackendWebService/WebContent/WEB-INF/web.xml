@@ -7,7 +7,7 @@
     <servlet-class>com.projects.webservice.mongodb.BackendWS</servlet-class>
   </servlet>
   <listener>
-    <listener-class>com.projects.webservice.mongodb.servlet.MyServletContextListener</listener-class>
+    <listener-class>com.projects.webservice.mongodb.servlet.SoapServletContextListener</listener-class>
   </listener>
   <context-param>
     <param-name>mongodb_host</param-name>
