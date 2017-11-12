@@ -38,11 +38,12 @@ public final class MessageRepositoryImpl implements MessageRepositoryServerInter
 	}
 	
 	@GET
-	@Path("/getMessages/{id: .*}")
+	@Path("/getMessages/{id:.*}")
 	@Produces(MediaType.APPLICATION_XML)
 	public List<MessageContainer> getMessages(@PathParam("id") final String id) {
 		checkCredentials();
-		return ((MongoDBManager)sc.getAttribute(Utility.MongoDBManagerServletContextAttributeName)).getMessages(id);
+		String temp = id.equals("null") ? null : id;	
+		return ((MongoDBManager)sc.getAttribute(Utility.MongoDBManagerServletContextAttributeName)).getMessages(id.equals("null") ? null : id);
 	}
 
 	@GET

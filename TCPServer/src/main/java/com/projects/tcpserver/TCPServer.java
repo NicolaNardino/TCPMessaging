@@ -25,6 +25,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.projects.tcpserver.jaxb.MessageContainer;
+import com.projects.tcpserver.restful.MessageRepositoryClientInterface;
+import com.projects.tcpserver.restful.MessageRepositoryRestfulClient;
 import com.projects.tcpserver.webservice.mongodb.client.BackendWS;
 import com.projects.tcpserver.webservice.mongodb.client.BackendWSService;
 import com.projects.tcpserver.webservice.mongodb.client.CredentialsCheckException_Exception;
@@ -39,12 +41,14 @@ public final class TCPServer implements ITCPServer {
 	private final ExecutorService es;
 	private final ScheduledExecutorService ses; //this is only used in case the server would have to be automatically stopped after a given delay.
 	private final int port;
-	private final BackendWS backendWSPort;
+	private BackendWS backendWSPort;
+	private MessageRepositoryClientInterface mrci;
 	private final ArrayBlockingQueue<MessageContainer> messageQueue;
 	private final List<MessageContainer> tempMessageList;
 	private final int messageQueueDrainThreshold;
 	private final int storeMessagesEveryXSeconds;
 	private final int buildMessagesStatsEveryXSeconds;
+	private final boolean useRestfulWebService;
 	private volatile boolean isStopped;
 	private ServerSocket serverSocket;
 	
@@ -55,8 +59,13 @@ public final class TCPServer implements ITCPServer {
 		port = Integer.valueOf(properties.getProperty("serverPort"));
 		final BackendWSService backendWSService = new BackendWSService(new URL(properties.getProperty("backendWSURL")));
 		backendWSService.setHandlerResolver(new SoapHandlerResolver(Boolean.valueOf(properties.getProperty("storeOutboundMessages"))));
-		backendWSPort = backendWSService.getBackendWSPort();
-		setWebServiceCredentials(backendWSPort, properties.getProperty("backendWSUsername"), properties.getProperty("backendWSPassword"));
+		useRestfulWebService = Boolean.valueOf(properties.getProperty("useRestfulWebService"));
+		if (useRestfulWebService) 
+			mrci = new MessageRepositoryRestfulClient(properties.getProperty("restfulBaseURL"), properties.getProperty("restfulBackendWSUsername"), properties.getProperty("restfulBackendWSPassword"));
+		else {
+			backendWSPort = backendWSService.getBackendWSPort();
+			setWebServiceCredentials(backendWSPort, properties.getProperty("backendWSUsername"), properties.getProperty("backendWSPassword"));	
+		}
 		final Integer messageQueueSize = Integer.valueOf(properties.getProperty("messageQueueSize"));
 		messageQueue = new ArrayBlockingQueue<MessageContainer>(messageQueueSize);
 		tempMessageList = new ArrayList<>();
@@ -125,23 +134,35 @@ public final class TCPServer implements ITCPServer {
 			//logger.debug("messageQueue.remainingCapacity() "+messageQueue.remainingCapacity());
 			if (messageQueue.remainingCapacity() <= messageQueueDrainThreshold) {
 				messageQueue.drainTo(tempMessageList);
-				try {
-					backendWSPort.storeMessages(convertMessageContainerToJAXBType(tempMessageList));
-				} 
-				catch (final CredentialsCheckException_Exception e) {
-					logger.warn("Unable to store client messages due to failed credentials check.");
+				if (!storeMessages(tempMessageList))
 					break;
-				}
-				catch (final Exception e) {
-					logger.warn("Error while storing messages.", e);
-				}
-				logger.debug("Stored "+tempMessageList.size()+" to backend database.");
-				tempMessageList.clear();
 			}
 			try {
 				TimeUnit.SECONDS.sleep(storeMessagesEveryXSeconds);
 			} catch (InterruptedException e) {}
 		}
+	}
+	
+	private boolean storeMessages(final List<MessageContainer> messages) {
+		if (useRestfulWebService) {
+			if(!mrci.storeMessages(tempMessageList)) {
+				logger.warn("Unable to store client messages due to failed credentials check.");
+				return false;
+			}
+		}
+		else
+			try {
+				backendWSPort.storeMessages(convertMessageContainerToJAXBType(tempMessageList));
+			} catch (final CredentialsCheckException_Exception e) {
+				logger.warn("Unable to store client messages due to failed credentials check.");
+				return false;
+			} catch (final Exception e) {
+				logger.warn("Error while storing messages.", e);
+				return false;
+			}
+		logger.debug("Stored "+tempMessageList.size()+" to backend database.");
+		tempMessageList.clear();
+		return true;
 	}
 	
 	/**
@@ -151,30 +172,43 @@ public final class TCPServer implements ITCPServer {
 	 * */
 	private void buildMessageStats() {
 		Thread.currentThread().setName("MessageStats-Thread");
-		while(!isStopped()) {
+		while (!isStopped()) {
 			final StringBuilder sb = new StringBuilder();
-			List<com.projects.tcpserver.webservice.mongodb.client.MessageContainer> messages;
-			try {
-				messages = backendWSPort.getMessages(null);
-				sb.append("Total nr. messages: ").append(messages.size()).append("\n");
-				final Map<String, Long> messagesBySenderMap = 
-						messages.parallelStream().filter(m -> m.getSenderIdentifier() != null && m.getTargetIdentifier() != null).
-						collect(Collectors.groupingBy(com.projects.tcpserver.webservice.mongodb.client.MessageContainer::getSenderIdentifier, Collectors.counting()));
-				for(final Map.Entry<String, Long> messagesBySender: messagesBySenderMap.entrySet()) 
-					sb.append("Messages sent by: "+messagesBySender.getKey()+", nr.: "+messagesBySender.getValue()+"\n");
-				logger.debug(sb.toString());
-			} 
-			catch (final CredentialsCheckException_Exception e) {
-				logger.warn("Unable to read messages due to failed credentials check.");
+			final List<com.projects.tcpserver.webservice.mongodb.client.MessageContainer> messages = getMessages();
+			if (messages == null)
 				break;
-			}
-			catch (final Exception e) {
-				logger.warn("Error while getting messages.", e);
-			}
-			try {
-				TimeUnit.SECONDS.sleep(buildMessagesStatsEveryXSeconds);
-			} catch (InterruptedException e) {}
+			sb.append("Total nr. messages: ").append(messages.size()).append("\n");
+			final Map<String, Long> messagesBySenderMap = messages.parallelStream()
+					.filter(m -> m.getSenderIdentifier() != null && m.getTargetIdentifier() != null)
+					.collect(Collectors.groupingBy(
+							com.projects.tcpserver.webservice.mongodb.client.MessageContainer::getSenderIdentifier,
+							Collectors.counting()));
+			for (final Map.Entry<String, Long> messagesBySender : messagesBySenderMap.entrySet())
+				sb.append("Messages sent by: " + messagesBySender.getKey() + ", nr.: " + messagesBySender.getValue()
+						+ "\n");
+			logger.debug(sb.toString());
 		}
+		try {
+			TimeUnit.SECONDS.sleep(buildMessagesStatsEveryXSeconds);
+		} catch (InterruptedException e) {
+		}
+	}
+	
+	private List<com.projects.tcpserver.webservice.mongodb.client.MessageContainer> getMessages() {
+		if (useRestfulWebService)
+			return convertMessageContainerToJAXBType(mrci.getMessages(null));
+		else {
+			try {
+				return backendWSPort.getMessages(null);
+			} catch (final CredentialsCheckException_Exception e) {
+				logger.warn("Unable to read messages due to failed credentials check.");
+				return null;
+			} catch (final Exception e) {
+				logger.warn("Error while getting messages.", e);
+				return null;
+			}
+		}
+
 	}
 	
 	private static void setWebServiceCredentials(final BackendWS backendWSPort, final String username, final String password) {

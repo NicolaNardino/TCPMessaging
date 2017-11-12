@@ -1,5 +1,7 @@
 package com.projects.tcpserver.restful;
 
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.client.Entity;
@@ -56,7 +58,7 @@ public final class MessageRepositoryRestfulClient implements MessageRepositoryCl
 
 	@Override
 	public boolean storeMessages(final List<MessageContainer> messages) {
-		final ResteasyWebTarget storeMessages = client.target(restfulBaseURL+"/storeMessages");
+		final ResteasyWebTarget storeMessages = client.target(restfulBaseURL+"storeMessages");
 		final Builder request = storeMessages.request();
 		setRequestHeaders(request);
 		final Response response = request.post(Entity.entity(new MessageContainerList(messages), MediaType.APPLICATION_XML));
@@ -70,7 +72,7 @@ public final class MessageRepositoryRestfulClient implements MessageRepositoryCl
 		final Builder request = getMessages.request(MediaType.APPLICATION_XML);
 		setRequestHeaders(request);
 		final Response response = request.get();
-		final List<MessageContainer> messages = response.readEntity(new GenericType<List<MessageContainer>>() {});
+		final List<MessageContainer> messages = response.getStatus() != Response.Status.OK.getStatusCode() ? null : response.readEntity(new GenericType<List<MessageContainer>>() {});
 		response.close();
 		return messages;
 	}
@@ -82,7 +84,11 @@ public final class MessageRepositoryRestfulClient implements MessageRepositoryCl
 	
 	public static void main(final String[] args) {
 		final MessageRepositoryClientInterface cli = new MessageRepositoryRestfulClient("http://localhost:8080/RestfulBackend/rest/message/", "test_username", "test_password");
-		System.out.println(cli.getMessage("rr"));
+		cli.storeMessages(Arrays.asList(new MessageContainer("id1", "t1d1", "mess1", new Date()), 
+				new MessageContainer("id2", "t1d2", "mess2", new Date()), 
+				new MessageContainer("id3", "t1d3", "mess3", new Date())));
+		//System.out.println(cli.getMessage("rr"));
+		System.out.println(cli.getMessages(null));
 	}
 }
 
