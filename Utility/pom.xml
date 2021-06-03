@@ -4,7 +4,7 @@
   <artifactId>Utility</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <properties>
-    <resteasy.version>3.0.19.Final</resteasy.version>
+    <resteasy.version>4.5.7.Final</resteasy.version>
   </properties>
   <dependencies>
 <dependency>
